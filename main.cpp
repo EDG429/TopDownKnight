@@ -21,8 +21,11 @@ int main()
     Texture2D map = LoadTexture("nature_tileset/WorldMap.png");
     Vector2 mapPos{-384 / 2, -384 / 2};
 
+    // Sprite sheets
     Texture2D knightIdle = LoadTexture("characters/knight_idle_spritesheet.png");
     Texture2D knightRun = LoadTexture("characters/knight_run_spritesheet.png");
+    Texture2D knightAttack = LoadTexture("characters/weapon_sword-Sheet-sheet.png"); 
+
     Vector2 knightPos{
         384 / 2.0f - 4.0f * (0.5f * (float)knightIdle.width / 6.0f),
         384 / 2.0f - 4.0f * (0.5f * (float)knightIdle.height)};
@@ -30,16 +33,21 @@ int main()
 
     // Define animations with their specific properties
     std::vector<Animation> animations = {
-        {6, 1.0f / 12.0f, &knightIdle}, // Idle animation: 6 frames, update every 1/12 second
-        {6, 1.0f / 12.0f, &knightRun}   // Running animation: 6 frames, update every 1/12 second
+        {6, 1.0f / 12.0f, &knightIdle},
+        {6, 1.0f / 12.0f, &knightRun}
     };
 
-    // Creating the animation engine for the knight with the new constructor that takes a vector of animations
+    // Define attack animation
+    Animation attackAnimation = {2, 1.0f / 12.0f, &knightAttack}; // 2 frames, fast update
+
+    // Creating the animation engine for the knight with the constructor
     AnimEngine knightAnimation(
-        {0.0f, 0.0f, knightIdle.width / 6.0f, (float)knightIdle.height}, // Initial rectangle size based on idle animation
-        {windowDimensions[0] / 2.0f - knightIdle.width / 12.0f, (float)(windowDimensions[1] - knightIdle.height)}, // Position
-        animations // Pass the vector of animations
+        {0.0f, 0.0f, knightIdle.width / 6.0f, (float)knightIdle.height}, 
+        {windowDimensions[0] / 2.0f - knightIdle.width / 12.0f, (float)(windowDimensions[1] - knightIdle.height)}, 
+        animations, 
+        attackAnimation
     );
+    
 
     while (!WindowShouldClose())
     {
@@ -48,6 +56,7 @@ int main()
         ClearBackground(WHITE);
 
         Vector2 direction{};
+        bool attack = IsMouseButtonPressed(MOUSE_LEFT_BUTTON); // Check for attack input
 
         if (IsKeyDown(KEY_A))
             direction.x -= 1.0;
@@ -63,7 +72,7 @@ int main()
         if (direction.x != 0.0)
             rightLeft = (direction.x < 0.f) ? -1.f : 1.f;
 
-        knightAnimation.Update(dT, Vector2Length(direction) != 0.0);
+        knightAnimation.Update(dT, Vector2Length(direction) != 0.0, attack);
         knightAnimation.Draw(rightLeft, knightPos);
 
         if (Vector2Length(direction) != 0.0) {
@@ -76,6 +85,7 @@ int main()
     UnloadTexture(map);
     UnloadTexture(knightIdle);
     UnloadTexture(knightRun);
+    UnloadTexture(knightAttack);
 
     CloseWindow();
     return 0;
