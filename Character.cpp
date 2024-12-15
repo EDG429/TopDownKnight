@@ -22,3 +22,8 @@ void Character::Draw() {
     animation.Draw(direction, position);
 }
 
+int Character::TakeDamage(int damage)
+{
+    health -= damage;
+    return health;
+}

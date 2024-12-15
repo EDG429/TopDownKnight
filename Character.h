@@ -9,7 +9,8 @@ class Character {
 private:
     Vector2 position;
     float speed;
-    float direction; // -1 for left, 1 for right    
+    float direction; // -1 for left, 1 for right   
+    int health; // for future health implementation 
 
 public:
     AnimEngine animation;
@@ -20,6 +21,7 @@ public:
     void Draw();
     Vector2 GetPosition() const { return position; }
     bool IsAttacking() const { return animation.IsAttacking(); }
+    int TakeDamage(int damage);
 
 private:
     void Move(Vector2 direction);

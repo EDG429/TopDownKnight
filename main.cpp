@@ -29,7 +29,7 @@ int main()
 
     std::vector<Animation> animations = {
         {6, 1.0f / 12.0f, &knightIdle},
-        {6, 1.0f / 12.0f, &knightRun}
+        {6, 1.0f / 12.0f, &knightRun},        
     };
 
     Animation attackAnimation = {2, 1.0f / 12.0f, &knightAttack}; 
