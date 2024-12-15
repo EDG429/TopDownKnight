@@ -3,6 +3,7 @@
 #include "AnimEngine.h"
 #include <stdlib.h>
 #include <string.h>
+#include <vector> // Include vector for std::vector
 
 int main()
 {
@@ -27,12 +28,17 @@ int main()
         384 / 2.0f - 4.0f * (0.5f * (float)knightIdle.height)};
     float rightLeft{1.f}; // 1: facing right, -1 facing left
 
-    // Creating the animation engine for the knight
+    // Define animations with their specific properties
+    std::vector<Animation> animations = {
+        {6, 1.0f / 12.0f, &knightIdle}, // Idle animation: 6 frames, update every 1/12 second
+        {6, 1.0f / 12.0f, &knightRun}   // Running animation: 6 frames, update every 1/12 second
+    };
+
+    // Creating the animation engine for the knight with the new constructor that takes a vector of animations
     AnimEngine knightAnimation(
-        {0.0f, 0.0f, knightIdle.width / 6.0f, (float)knightIdle.height},
-        {windowDimensions[0] / 2.0f - knightIdle.width / 12.0f, (float)(windowDimensions[1] - knightIdle.height)},
-        1.0f / 12.0f,
-        &knightIdle, &knightRun
+        {0.0f, 0.0f, knightIdle.width / 6.0f, (float)knightIdle.height}, // Initial rectangle size based on idle animation
+        {windowDimensions[0] / 2.0f - knightIdle.width / 12.0f, (float)(windowDimensions[1] - knightIdle.height)}, // Position
+        animations // Pass the vector of animations
     );
 
     while (!WindowShouldClose())
