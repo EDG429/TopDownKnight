@@ -1,87 +1,110 @@
 #include "raylib.h"
 #include "raymath.h"
-#include "AnimEngine.h"
 #include "Character.h"
-#include <stdlib.h>
-#include <string.h>
-#include <vector> 
+#include "Prop.h"
+#include "Enemy.h"
+#include <string>
 
 int main()
 {
-    // Window dimensions
-    int windowDimensions[2]{384, 384};
+    const int windowWidth{384};
+    const int windowHeight{384};
+    InitWindow(windowWidth, windowHeight, "Stephen's Top Down");
 
-    // Window initialization
-    InitWindow(windowDimensions[0], windowDimensions[1], "Top Down");
+    Texture2D map = LoadTexture("nature_tileset/OpenWorldMap24x24.png");
+    Vector2 mapPos{0.0, 0.0};
+    const float mapScale{4.0f};
+
+    Character knight{windowWidth, windowHeight};
+
+    Prop props[2]{
+        Prop{Vector2{600.f, 300.f}, LoadTexture("nature_tileset/Rock.png")},
+        Prop{Vector2{400.f, 500.f}, LoadTexture("nature_tileset/Log.png")}};
+
+    Enemy goblin{
+        Vector2{800.f, 300.f},
+        LoadTexture("characters/goblin_idle_spritesheet.png"),
+        LoadTexture("characters/goblin_run_spritesheet.png")};
+
+    Enemy slime{
+        Vector2{500.f, 700.f},
+        LoadTexture("characters/slime_idle_spritesheet.png"),
+        LoadTexture("characters/slime_run_spritesheet.png")};
+
+    Enemy *enemies[]{
+        &goblin,
+        &slime};
+
+    for (auto enemy : enemies)
+    {
+        enemy->setTarget(&knight);
+    }
+
     SetTargetFPS(60);
-
-    // Constants
-    float speed{4.0};
-
-    // Textures
-    Texture2D map = LoadTexture("nature_tileset/WorldMap.png");
-    Vector2 mapPos{-384 / 2, -384 / 2};
-
-    // Sprite sheets
-    Texture2D knightIdle = LoadTexture("characters/knight_idle_spritesheet.png");
-    Texture2D knightRun = LoadTexture("characters/knight_run_spritesheet.png");
-    Texture2D knightAttack = LoadTexture("characters/weapon_sword-Sheet-sheet.png"); 
-
-    std::vector<Animation> animations = {
-        {6, 1.0f / 12.0f, &knightIdle},
-        {6, 1.0f / 12.0f, &knightRun},        
-    };
-
-    Animation attackAnimation = {2, 1.0f / 12.0f, &knightAttack}; 
-
-    // Create character
-    Character knight(animations, attackAnimation, 
-                     {windowDimensions[0] / 2.0f - knightIdle.width / 12.0f, (float)(windowDimensions[1] - knightIdle.height)}, 
-                     speed);
-    
-    // Camera
-    Camera2D camera = { 0 };
-    camera.target = knight.animation.GetPos(); // Set target to knight's position
-    camera.offset = (Vector2){windowDimensions[0] / 2.0f - 45, windowDimensions[1] / 2.0f - 45}; // Center of the screen
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f; // Adjust zoom if needed
-
-    camera.target = knight.animation.GetPos(); // This ensures the camera follows the knight
-
-
-
     while (!WindowShouldClose())
     {
-        const float dT = GetFrameTime();
         BeginDrawing();
-        BeginMode2D(camera);
         ClearBackground(WHITE);
 
-        Vector2 direction{};
-        bool attack = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+        mapPos = Vector2Scale(knight.getWorldPos(), -1.f);
 
-        if (IsKeyDown(KEY_A)) direction.x -= 1.0;
-        if (IsKeyDown(KEY_D)) direction.x += 1.0;
-        if (IsKeyDown(KEY_W)) direction.y -= 1.0;
-        if (IsKeyDown(KEY_S)) direction.y += 1.0;
+        // draw the map
+        DrawTextureEx(map, mapPos, 0.0, 4.0, WHITE);
 
-        DrawTextureEx(map, mapPos, 0, 4.0, WHITE);
+        // draw the props
+        for (auto prop : props)
+        {
+            prop.Render(knight.getWorldPos());
+        }
 
-        knight.Update(dT, direction, attack);
-        knight.Draw();
+        if (!knight.getAlive()) // Character is not alive
+        {
+            DrawText("Game Over!", 55.f, 45.f, 40, RED);
+            EndDrawing();
+            continue;
+        }
+        else // Character is alive
+        {
+            std::string knightsHealth = "Health: ";
+            knightsHealth.append(std::to_string(knight.getHealth()), 0, 5);
+            DrawText(knightsHealth.c_str(), 55.f, 45.f, 40, RED);
+        }
 
-        if (Vector2Length(direction) != 0.0) {
-            mapPos = Vector2Subtract(mapPos, Vector2Scale(Vector2Normalize(direction), speed));
+        knight.tick(GetFrameTime());
+        // check map bounds
+        if (knight.getWorldPos().x < 0.f ||
+            knight.getWorldPos().y < 0.f ||
+            knight.getWorldPos().x + windowWidth > map.width * mapScale ||
+            knight.getWorldPos().y + windowHeight > map.height * mapScale)
+        {
+            knight.undoMovement();
+        }
+        // check prop collisions
+        for (auto prop : props)
+        {
+            if (CheckCollisionRecs(prop.getCollisionRec(knight.getWorldPos()), knight.getCollisionRec()))
+            {
+                knight.undoMovement();
+            }
+        }
+
+        for (auto enemy : enemies)
+        {
+            enemy->tick(GetFrameTime());
+        }
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            for (auto enemy : enemies)
+            {
+                if (CheckCollisionRecs(enemy->getCollisionRec(), knight.getWeaponCollisionRec()))
+                {
+                    enemy->setAlive(false);
+                }
+            }
         }
 
         EndDrawing();
     }
-    // Freeing memory
-    UnloadTexture(map);
-    UnloadTexture(knightIdle);
-    UnloadTexture(knightRun);
-    UnloadTexture(knightAttack);
-
     CloseWindow();
-    return 0;
 }

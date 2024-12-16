@@ -12,30 +12,20 @@
                 "BUILD_MODE=DEBUG"
             ],
             "windows": {
-                "command": "C:/raylib/w64devkit/bin/mingw32-make.exe",
+                "command": "C:/raylib/mingw/bin/mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
+                    "PROJECT_NAME=main",
                     "OBJS=*.cpp",
                     "BUILD_MODE=DEBUG"
-                ]
+                ],
             },
             "osx": {
                 "args": [
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
+                    "PROJECT_NAME=main",
                     "OBJS=*.cpp",
                     "BUILD_MODE=DEBUG"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "DESTDIR=/home/linuxbrew/.linuxbrew",
-                    "RAYLIB_LIBTYPE=SHARED",
-                    "EXAMPLE_RUNTIME_PATH=/home/linuxbrew/.linuxbrew/lib",
-                    "OBJS=*.cpp",
-                    "BUILD_MODE=DEBUG"
-                ]
+                ],
             },
             "group": {
                 "kind": "build",
@@ -50,39 +40,26 @@
             "type": "process",
             "command": "make",
             "args": [
-                "PLATFORM=PLATFORM_DESKTOP"
+                "PLATFORM=PLATFORM_DESKTOP",
             ],
             "windows": {
-                "command": "C:/raylib/w64devkit/bin/mingw32-make.exe",
+                "command": "C:/raylib/mingw/bin/mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
+                    "PROJECT_NAME=main",
                     "OBJS=*.cpp"
-                ]
+                ],
             },
             "osx": {
                 "args": [
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
+                    "PROJECT_NAME=main",
                     "OBJS=*.cpp"
-                ]
+                ],
             },
-            "linux": {
-                "args": [
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "DESTDIR=/home/linuxbrew/.linuxbrew",
-                    "RAYLIB_LIBTYPE=SHARED",
-                    "EXAMPLE_RUNTIME_PATH=/home/linuxbrew/.linuxbrew/lib",
-                    "OBJS=*.cpp"
-                ]
-            },
+            "group": "build",
             "problemMatcher": [
                 "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "detail": "compiler: C:\\raylib\\w64devkit\\bin\\g++.exe"
+            ]
         }
     ]
 }
