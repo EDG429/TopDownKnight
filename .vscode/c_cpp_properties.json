@@ -20,7 +20,8 @@
     {
       "name": "Mac",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "/opt/homebrew/include"
       ],
       "defines": [
         "_DEBUG",
@@ -40,7 +41,7 @@
     {
       "name": "Linux",
       "includePath": [
-        "<path_to_raylib>/src/**",
+        "/home/linuxbrew/.linuxbrew/include",
         "${workspaceFolder}/**"
       ],
       "defines": [
@@ -50,10 +51,9 @@
         "GRAPHICS_API_OPENGL_33",
         "PLATFORM_DESKTOP"
       ],
-      "compilerPath": "usr/bin/clang",
       "cStandard": "c11",
       "cppStandard": "c++14",
-      "intelliSenseMode": "clang-x64"
+      "intelliSenseMode": "gcc-x64"
     }
   ],
   "version": 4
